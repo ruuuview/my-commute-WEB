@@ -157,9 +157,12 @@ body.cursor-hover .cursor-ring { width: 56px; height: 56px; border-color: rgba(1
 body.cursor-active .cursor-lens { opacity: 0.92; }
 
 /* LAYOUT */
-.container { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 0 60px; }
-@media (max-width: 900px) { .container { padding: 0 32px; } }
-@media (max-width: 600px) { .container { padding: 0 20px; } }
+/* ============================================================
+   LAYOUT — tightened container side padding
+   ============================================================ */
+.container { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 0 72px; }
+@media (max-width: 900px) { .container { padding: 0 36px; } }
+@media (max-width: 600px) { .container { padding: 0 22px; } }
 
 /* ============================================================
    LIVE STATUS BAR — top of page
@@ -197,39 +200,66 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 .status-bar-time { color: rgba(255,255,255,0.35); }
 .status-bar-tag {
   padding: 2px 8px; border-radius: 4px;
-  background: rgba(16,185,129,0.08);
-  border: 0.5px solid rgba(16,185,129,0.2);
-  color: rgba(16,185,129,0.7);
+  background: rgba(0,152,212,0.12);
+  border: 0.5px solid rgba(0,152,212,0.4);
+  color: rgba(0,152,212,0.95);
+  font-weight: 700;
 }
 
-/* Nav TfL line colour pills — identity only, no fake status */
+/* Nav TfL line colour pills — cycling through all 14 lines */
 .nav-tfl-status {
   display: flex; align-items: center; gap: 5px;
 }
 .nav-line-pill {
-  display: inline-flex; align-items: center;
+  display: inline-flex; align-items: center; gap: 5px;
   padding: 3px 11px; border-radius: var(--rp);
   font-family: var(--mono); font-size: 9px; font-weight: 700;
   letter-spacing: 0.13em; text-transform: uppercase;
-  transition: transform 0.35s var(--spring), filter 0.2s;
+  transition: transform 0.35s var(--spring), filter 0.2s, background 0.4s, border-color 0.4s, color 0.4s;
   cursor: default; white-space: nowrap;
 }
 .nav-line-pill:hover {
   transform: scale(1.1) translateY(-2px);
   filter: brightness(1.18);
 }
-/* Each line uses its exact TfL brand colour */
-.nl-bakerloo { background: rgba(137,78,36,0.22);  border: 0.5px solid rgba(137,78,36,0.7);  color: #B06010; }
+/* Status dot inside pill */
+.pill-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: currentColor; opacity: 0.8;
+  flex-shrink: 0;
+}
+/* Line colour definitions */
+.nl-bakerloo { background: rgba(137,78,36,0.22);  border: 0.5px solid rgba(137,78,36,0.7);  color: #B36305; }
 .nl-central  { background: rgba(220,36,31,0.18);  border: 0.5px solid rgba(220,36,31,0.65); color: #E32017; }
 .nl-circle   { background: rgba(255,211,0,0.14);  border: 0.5px solid rgba(255,211,0,0.6);  color: #cca800; }
 .nl-district { background: rgba(0,120,42,0.18);   border: 0.5px solid rgba(0,120,42,0.65);  color: #00782A; }
-.nl-hammersmith { background: rgba(244,169,190,0.18); border: 0.5px solid rgba(244,169,190,0.6); color: #F3A9BB; }
+.nl-hammersmith { background: rgba(244,169,190,0.18); border: 0.5px solid rgba(244,169,190,0.6); color: #e87fa0; }
 .nl-jubilee  { background: rgba(161,165,167,0.15); border: 0.5px solid rgba(161,165,167,0.5); color: #A0A5A9; }
 .nl-metropolitan { background: rgba(155,0,86,0.2); border: 0.5px solid rgba(155,0,86,0.65); color: #9B0056; }
-.nl-northern { background: rgba(0,0,0,0.35);       border: 0.5px solid rgba(255,255,255,0.22); color: rgba(255,255,255,0.7); }
+.nl-northern { background: rgba(255,255,255,0.08); border: 0.5px solid rgba(255,255,255,0.22); color: rgba(255,255,255,0.75); }
 .nl-piccadilly { background: rgba(0,54,136,0.22); border: 0.5px solid rgba(0,54,136,0.7);  color: #4a7fd4; }
 .nl-victoria { background: rgba(0,152,212,0.18);  border: 0.5px solid rgba(0,152,212,0.65); color: #0098D4; }
 .nl-elizabeth { background: rgba(106,16,176,0.2); border: 0.5px solid rgba(106,16,176,0.65); color: #9B59C6; }
+.nl-dlr      { background: rgba(0,175,173,0.18);  border: 0.5px solid rgba(0,175,173,0.6);  color: #00AFAD; }
+.nl-overground { background: rgba(238,124,14,0.18); border: 0.5px solid rgba(238,124,14,0.6); color: #EE7C0E; }
+.nl-waterloo { background: rgba(149,205,186,0.18); border: 0.5px solid rgba(149,205,186,0.5); color: #95CDBA; }
+/* Pill fade animation */
+.nav-line-pill.pill-fade-out { opacity: 0; transform: translateY(-6px) scale(0.9); }
+.nav-line-pill.pill-fade-in  { opacity: 1; transform: translateY(0) scale(1); }
+
+/* Fix 1 — Synced 3D flip heartbeat: all pills share one global timer */
+@keyframes pillHeartbeat {
+  0%, 88%  { transform: rotateX(0deg) scale(1); filter: brightness(1); }
+  92%      { transform: rotateX(-90deg) scale(0.95); filter: brightness(0.3); }
+  96%      { transform: rotateX(90deg) scale(0.95); filter: brightness(0.3); }
+  100%     { transform: rotateX(0deg) scale(1); filter: brightness(1); }
+}
+.nav-line-pill {
+  animation: pillHeartbeat 3s cubic-bezier(0.16,1,0.3,1) infinite;
+  animation-delay: 0s;
+  transform-style: preserve-3d;
+  perspective: 400px;
+}
 @media (max-width: 780px) { .nav-tfl-status { display: none; } }
 
 
@@ -309,17 +339,21 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 .menu-trigger:hover span:nth-child(3) { width: 18px; }
 
 .nav-ef-badge {
-  font-family: var(--mono); font-size: 9px; font-weight: 400;
-  color: var(--ef-gold); letter-spacing: 0.12em;
-  border: 0.5px solid rgba(200,168,75,0.35);
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.92); letter-spacing: 0.12em;
+  border: 0.5px solid rgba(255,255,255,0.35);
   padding: 5px 12px; border-radius: var(--rp);
-  background: rgba(200,168,75,0.06);
+  background: rgba(255,255,255,0.08);
   text-transform: uppercase;
-  animation: goldPulse 3.5s ease-in-out infinite;
+  animation: whitePulse 3.5s ease-in-out infinite;
   transition: transform 0.4s var(--spring), box-shadow 0.3s;
   cursor: default;
 }
-.nav-ef-badge:hover { transform: scale(1.1) translateY(-2px); box-shadow: 0 8px 24px rgba(200,168,75,0.15); }
+.nav-ef-badge:hover { transform: scale(1.1) translateY(-2px); box-shadow: 0 8px 24px rgba(255,255,255,0.12); }
+@keyframes whitePulse {
+  0%,100% { border-color: rgba(255,255,255,0.28); }
+  50% { border-color: rgba(255,255,255,0.55); box-shadow: 0 0 14px rgba(255,255,255,0.1); }
+}
 @keyframes goldPulse {
   0%,100% { border-color: rgba(200,168,75,0.35); }
   50% { border-color: rgba(200,168,75,0.65); box-shadow: 0 0 16px rgba(200,168,75,0.12); }
@@ -379,31 +413,31 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 .hero {
   min-height: 100vh;
   display: flex; align-items: center;
-  padding: 120px 0 60px;
+  padding: 140px 0 80px;
   position: relative;
 }
 .hero-inner {
   position: relative; z-index: 2;
   display: grid;
-  grid-template-columns: 1fr 480px;
-  gap: 80px;
+  grid-template-columns: 1fr 500px;
+  gap: 100px;
   align-items: center;
   width: 100%;
 }
 .hero-left { display: flex; flex-direction: column; }
 .hero-right { display: flex; align-items: center; justify-content: flex-end; }
 @media (max-width: 1100px) {
-  .hero-inner { grid-template-columns: 1fr 380px; gap: 48px; }
+  .hero-inner { grid-template-columns: 1fr 400px; gap: 56px; }
 }
 @media (max-width: 860px) {
-  .hero-inner { grid-template-columns: 1fr; }
+  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
   .hero-right { justify-content: flex-start; }
 }
 
 .hero-eyebrow {
   font-family: var(--mono); font-size: 10px; font-weight: 400;
   color: var(--t3); letter-spacing: 0.2em; text-transform: uppercase;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
   display: flex; align-items: center; gap: 16px;
   opacity: 0; animation: fadeUp 0.8s var(--ease) 0.1s forwards;
 }
@@ -420,7 +454,7 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
   line-height: 0.92;
   letter-spacing: -0.03em;
   color: var(--t1);
-  margin-bottom: 40px;
+  margin-bottom: 48px;
   opacity: 0; animation: fadeUp 0.9s var(--ease) 0.2s forwards;
   cursor: none;
   transition: transform 0.45s var(--spring), letter-spacing 0.4s var(--ease);
@@ -439,16 +473,16 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 
 .hero-sub {
   font-size: 17px; font-weight: 400; color: var(--t2);
-  max-width: 500px; line-height: 1.8;
-  margin-bottom: 52px;
+  max-width: 520px; line-height: 1.85;
+  margin-bottom: 60px;
   opacity: 0; animation: fadeUp 0.9s var(--ease) 0.32s forwards;
 }
 .hero-sub strong { color: var(--t1); font-weight: 600; }
 
 .hero-ctas {
-  display: flex; gap: 12px; flex-wrap: wrap;
+  display: flex; gap: 16px; flex-wrap: wrap;
   opacity: 0; animation: fadeUp 0.9s var(--ease) 0.44s forwards;
-  margin-bottom: 56px;
+  margin-bottom: 0;
 }
 
 @keyframes fadeUp {
@@ -457,8 +491,15 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 }
 
 /* ============================================================
-   BUTTONS
+   BUTTONS — Fix 2: Premium CTA Refactor
    ============================================================ */
+
+/* Shimmer sweep keyframe for primary */
+@keyframes btnShimmer {
+  0%   { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(220%) skewX(-20deg); }
+}
+
 .btn-primary {
   display: inline-flex; align-items: center; gap: 9px;
   padding: 14px 28px;
@@ -466,26 +507,56 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
   border-radius: var(--rp); border: none; cursor: none;
   font-family: var(--display); font-size: 14px; font-weight: 700;
   letter-spacing: -0.01em; text-decoration: none;
+  position: relative; overflow: hidden;
   transition: transform 0.4s var(--spring), box-shadow 0.3s;
+  isolation: isolate;
+}
+/* Shimmer surface sweep */
+.btn-primary::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg,
+    transparent 30%,
+    rgba(255,255,255,0.38) 50%,
+    transparent 70%);
+  transform: translateX(-120%) skewX(-20deg);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.btn-primary:hover::after {
+  animation: btnShimmer 0.55s var(--ease) forwards;
 }
 .btn-primary:hover {
   transform: scale(1.06) translateY(-3px);
-  box-shadow: 0 16px 48px rgba(255,255,255,0.16);
+  box-shadow: 0 0 32px rgba(255,255,255,0.25), 0 16px 48px rgba(255,255,255,0.12);
 }
+
 .btn-ghost {
   display: inline-flex; align-items: center; gap: 9px;
   padding: 14px 28px;
   background: var(--surface-1); color: var(--t1);
-  border-radius: var(--rp); border: 0.5px solid var(--border-bright);
+  border-radius: var(--rp);
+  border: 1px solid rgba(255,255,255,0.35);
   cursor: none; backdrop-filter: blur(16px);
   font-family: var(--display); font-size: 14px; font-weight: 600;
   letter-spacing: -0.01em; text-decoration: none;
-  transition: transform 0.4s var(--spring), background 0.2s, box-shadow 0.3s;
+  transition: transform 0.4s var(--spring), background 0.2s, box-shadow 0.3s, border-color 0.2s;
 }
 .btn-ghost:hover {
   transform: scale(1.05) translateY(-3px);
-  background: var(--surface-hover);
+  background: rgba(255,255,255,0.08);
   box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+  border-color: rgba(255,255,255,0.55);
+}
+
+/* Micro-copy label beneath both CTAs */
+.btn-micro {
+  font-family: var(--mono); font-size: 8px; opacity: 0.6;
+  text-align: center; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--t3); margin-top: 5px; pointer-events: none;
+}
+.hero-cta-wrap {
+  display: flex; flex-direction: column; align-items: flex-start;
 }
 
 /* ============================================================
@@ -568,7 +639,7 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 }
 .sys-label {
   font-family: var(--mono); font-size: 10px; font-weight: 700;
-  color: var(--emerald); letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.96); letter-spacing: 0.18em; text-transform: uppercase;
 }
 .sys-sub {
   font-family: var(--mono); font-size: 8px; font-weight: 400;
@@ -689,7 +760,7 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 
 /* Stats row */
 .solari-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(4, 1fr);
   gap: 0.5px;
   background: rgba(255,255,255,0.04);
   border-top: 0.5px solid rgba(255,255,255,0.05);
@@ -697,18 +768,18 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 }
 .solari-stat {
   background: #030309;
-  padding: 14px 18px;
+  padding: 12px 14px;
   display: flex; flex-direction: column; gap: 4px;
   transition: background 0.2s;
 }
 .solari-stat:hover { background: #08080F; }
 .solari-stat-val {
-  font-family: var(--mono); font-size: 20px; font-weight: 700;
+  font-family: var(--mono); font-size: 14px; font-weight: 700;
   color: rgba(255,255,255,0.8); letter-spacing: -0.5px;
 }
 .solari-stat-label {
-  font-size: 9px; color: rgba(255,255,255,0.2);
-  text-transform: uppercase; letter-spacing: 0.1em;
+  font-size: 8px; color: rgba(255,255,255,0.2);
+  text-transform: uppercase; letter-spacing: 0.08em;
   font-family: var(--mono);
 }
 
@@ -736,7 +807,7 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
   display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
   vertical-align: middle; margin-right: 3px;
 }
-.tick-green { background: #10B981; box-shadow: 0 0 6px rgba(16,185,129,0.7); }
+.tick-green { background: #22C55E; box-shadow: 0 0 6px rgba(34,197,94,0.7); }
 .tick-amber { background: #F59E0B; box-shadow: 0 0 6px rgba(245,158,11,0.7); }
 .tick-red   { background: #EF4444; box-shadow: 0 0 6px rgba(239,68,68,0.7); }
 .tick-darkred { background: #7F1D1D; box-shadow: 0 0 6px rgba(127,29,29,0.8); }
@@ -768,11 +839,11 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 /* ============================================================
    SECTIONS
    ============================================================ */
-section { padding: 80px 0; }
+section { padding: 120px 0; }
 .sec-label {
   font-family: var(--mono); font-size: 9px;
   color: var(--t3); letter-spacing: 0.24em; text-transform: uppercase;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
   display: flex; align-items: center; gap: 12px;
 }
 .sec-label::before {
@@ -783,7 +854,7 @@ section { padding: 80px 0; }
   font-family: var(--display); font-weight: 700;
   font-size: clamp(44px, 7vw, 80px);
   line-height: 0.94; letter-spacing: -0.03em;
-  margin-bottom: 22px;
+  margin-bottom: 32px;
   transition: transform 0.5s var(--spring);
   cursor: default;
 }
@@ -791,7 +862,7 @@ section { padding: 80px 0; }
 
 /* TfL stripe */
 .tfl-stripe {
-  height: 3px; border-radius: 2px; margin-bottom: 40px; opacity: 0.6;
+  height: 3px; border-radius: 2px; margin-bottom: 56px; opacity: 0.6;
   background: linear-gradient(90deg,
     #B36305 0%,#B36305 7.14%,#E32017 7.14%,#E32017 14.28%,
     #FFD300 14.28%,#FFD300 21.42%,#00782A 21.42%,#00782A 28.56%,
@@ -805,7 +876,7 @@ section { padding: 80px 0; }
 /* ============================================================
    PROJECTS — dominant hierarchy
    ============================================================ */
-.projects-stack { display: flex; flex-direction: column; gap: 16px; }
+.projects-stack { display: flex; flex-direction: column; gap: 20px; }
 
 /* Project 01 — full width DOMINANT */
 .project-card-hero {
@@ -813,12 +884,12 @@ section { padding: 80px 0; }
   background: var(--surface-1);
   border: 0.5px solid var(--border);
   border-radius: var(--r);
-  padding: 40px;
+  padding: 52px 48px;
   text-decoration: none; color: inherit;
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto 1fr auto auto;
-  gap: 20px 40px;
+  gap: 24px 56px;
   position: relative; overflow: hidden;
   backdrop-filter: blur(28px) saturate(160%);
   box-shadow:
@@ -878,8 +949,12 @@ section { padding: 80px 0; }
   padding: 4px 12px; border-radius: var(--rp); width: fit-content;
 }
 .status-building {
-  background: rgba(245,158,11,0.08); color: var(--amber);
-  border: 0.5px solid rgba(245,158,11,0.28);
+  background: rgba(0,152,212,0.1); color: #0098D4;
+  border: 0.5px solid rgba(0,152,212,0.38);
+}
+.status-building .live-dot {
+  background: #0098D4 !important;
+  box-shadow: 0 0 8px rgba(0,152,212,0.8) !important;
 }
 
 .project-num {
@@ -1087,45 +1162,108 @@ section { padding: 80px 0; }
 .tl-label-green .tl-signal-status { color: rgba(16,185,129,0.55); }
 
 /* ============================================================
-   STORY — compact interactive tabs
+   STORY — Fix 3: Earned Story Accordion
    ============================================================ */
-.story-sections { display: flex; flex-direction: column; gap: 0; }
+.story-chapters { display: flex; flex-direction: column; gap: 0; }
 
-.story-tabs {
-  display: flex; gap: 0; margin-bottom: 0;
-  border-bottom: 0.5px solid var(--border);
+/* Chapter nav pills at top */
+.story-chapter-nav {
+  display: flex; gap: 8px; margin-bottom: 56px; flex-wrap: wrap;
 }
-.story-tab {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--t3); padding: 14px 20px; cursor: none;
-  background: none; border: none; border-bottom: 1.5px solid transparent;
-  margin-bottom: -0.5px;
-  transition: color 0.2s, border-color 0.2s;
-  display: flex; align-items: center; gap: 8px;
+.story-chapter-pill {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--t3); padding: 6px 14px;
+  border: 0.5px solid var(--border); border-radius: var(--rp);
+  background: var(--surface-1); text-decoration: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.35s var(--spring);
+  cursor: none; display: inline-flex; align-items: center; gap: 8px;
 }
-.story-tab:hover { color: var(--t2); }
-.story-tab.active { color: var(--emerald); border-bottom-color: var(--emerald); }
-.story-tab-num {
-  font-size: 16px; font-weight: 700; font-family: var(--display);
-  line-height: 1; color: inherit;
+.story-chapter-pill:hover { color: var(--t1); border-color: var(--border-bright); background: var(--surface-2); transform: translateY(-2px); }
+.story-chapter-pill.active { color: var(--t1); border-color: rgba(16,185,129,0.5); background: rgba(16,185,129,0.07); }
+.pill-indicator { font-size: 11px; font-weight: 400; opacity: 0.7; transition: transform 0.3s var(--spring); }
+.story-chapter-pill.active .pill-indicator { transform: rotate(45deg); }
+
+/* Each chapter block */
+.story-chapter {
+  border-left: 1.5px solid rgba(255,255,255,0.06);
+  padding: 0 0 0 40px;
+  position: relative;
+  transition: border-color 0.4s;
+  overflow: hidden;
+}
+.story-chapter:hover { border-color: rgba(16,185,129,0.25); }
+.story-chapter::before {
+  content: '';
+  position: absolute; left: -5px; top: 20px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--void);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s, transform 0.4s var(--spring);
+}
+.story-chapter:hover::before {
+  background: var(--emerald);
+  border-color: var(--emerald);
+  box-shadow: 0 0 14px var(--emerald);
+  transform: scale(1.4);
+}
+.story-chapter + .story-chapter {
+  border-top: 0.5px solid var(--border);
 }
 
-.story-panel {
-  display: none; padding: 40px 0 48px;
+/* Teaser (always visible) */
+.story-chapter-teaser {
+  padding: 22px 0 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: none;
+  user-select: none;
 }
-.story-panel.active { display: grid; grid-template-columns: 1fr 1.6fr; gap: 60px; align-items: start; }
-@media (max-width: 640px) { .story-panel.active { grid-template-columns: 1fr; gap: 24px; } }
+.story-chapter-teaser-text {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--t3);
+  transition: color 0.2s;
+}
+.story-chapter:hover .story-chapter-teaser-text,
+.story-chapter.open .story-chapter-teaser-text { color: var(--t2); }
+.teaser-toggle {
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--t3); transition: color 0.2s, transform 0.35s var(--spring);
+}
+.story-chapter.open .teaser-toggle { color: var(--emerald); transform: rotate(45deg); }
 
-.story-panel-label {
+/* Expandable body — max-height accordion */
+.story-chapter-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.6s var(--ease), opacity 0.4s var(--ease), padding 0.4s var(--ease);
+  opacity: 0;
+  padding-bottom: 0;
+}
+.story-chapter.open .story-chapter-body {
+  max-height: 600px;
+  opacity: 1;
+  padding-bottom: 56px;
+}
+
+.story-chapter-num {
   font-family: var(--mono); font-size: 9px; color: var(--t3);
   letter-spacing: 0.2em; text-transform: uppercase;
-  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 16px;
 }
-.story-panel-title {
-  font-family: var(--display); font-size: 22px; font-weight: 700;
-  color: var(--t2); letter-spacing: -0.01em; margin-top: 6px;
+.story-chapter-grid {
+  display: grid; grid-template-columns: 260px 1fr; gap: 64px; align-items: start;
 }
-
+@media (max-width: 680px) { .story-chapter-grid { grid-template-columns: 1fr; gap: 24px; } }
+.story-chapter-label {
+  font-family: var(--display); font-size: 20px; font-weight: 700;
+  color: var(--t2); line-height: 1.3; letter-spacing: -0.02em;
+}
+/* Gold accent for origin chapter */
+.story-chapter.origin .story-chapter-label {
+  background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, var(--ef-gold) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
 .story-body-text {
   font-size: 17px; font-weight: 400; color: var(--t2); line-height: 1.82;
 }
@@ -1148,14 +1286,14 @@ section { padding: 80px 0; }
 
 /* Stats panel — shown once */
 .story-stats-row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-  margin-top: 48px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin-top: 72px;
 }
 @media (max-width: 640px) { .story-stats-row { grid-template-columns: 1fr 1fr; } }
 .story-stat {
   background: var(--surface-1);
   border: 0.5px solid var(--border);
-  border-radius: 14px; padding: 20px 18px;
+  border-radius: 16px; padding: 28px 24px;
   backdrop-filter: blur(20px);
   position: relative; overflow: hidden;
   transition: transform 0.55s var(--spring), border-color 0.25s, box-shadow 0.4s;
@@ -1184,7 +1322,7 @@ section { padding: 80px 0; }
 .ef-card {
   background: var(--surface-1);
   border: 0.5px solid rgba(200,168,75,0.2);
-  border-radius: var(--r); padding: 64px 52px;
+  border-radius: var(--r); padding: 88px 72px;
   backdrop-filter: blur(28px) saturate(165%);
   text-align: center; position: relative; overflow: hidden;
   box-shadow:
@@ -1213,7 +1351,7 @@ section { padding: 80px 0; }
   width: 56px; height: 56px; border-radius: 16px;
   background: rgba(200,168,75,0.08);
   border: 0.5px solid rgba(200,168,75,0.28);
-  margin: 0 auto 32px; position: relative; z-index: 1;
+  margin: 0 auto 40px; position: relative; z-index: 1;
   box-shadow: 0 0 28px rgba(200,168,75,0.1);
   animation: goldPulse 3.5s ease-in-out infinite;
 }
@@ -1222,11 +1360,11 @@ section { padding: 80px 0; }
   font-family: var(--display); font-weight: 700;
   font-size: clamp(32px, 5vw, 52px);
   letter-spacing: -0.03em; line-height: 1;
-  margin-bottom: 20px; position: relative; z-index: 1;
+  margin-bottom: 28px; position: relative; z-index: 1;
 }
 .ef-sub {
   font-size: 17px; font-weight: 400; color: var(--t2);
-  max-width: 500px; margin: 0 auto 40px; line-height: 1.78;
+  max-width: 520px; margin: 0 auto 52px; line-height: 1.82;
   position: relative; z-index: 1;
 }
 .ef-sub strong { color: var(--t1); font-weight: 600; }
@@ -1259,7 +1397,7 @@ footer {
 
 /* The massive EF marquee */
 .ef-marquee-wrap {
-  padding: 48px 0;
+  padding: 64px 0;
   overflow: hidden;
   border-bottom: 0.5px solid var(--border);
   position: relative;
@@ -1303,7 +1441,8 @@ footer {
 
 .footer-inner {
   display: grid; grid-template-columns: 1fr auto 1fr;
-  align-items: center; padding: 28px 0; gap: 24px;
+  align-items: center; padding: 36px 0 0; gap: 24px;
+  position: relative; z-index: 2;
 }
 .footer-left { display: flex; flex-direction: column; gap: 5px; }
 .footer-brand {
@@ -1341,8 +1480,9 @@ footer {
 .footer-tube {
   width: 100%;
   position: relative;
-  padding: 20px 0 8px;
+  padding: 0;
   overflow: hidden;
+  margin-top: -2px;
 }
 .footer-rail-track {
   position: relative;
@@ -1411,10 +1551,11 @@ footer {
   .footer-right { align-items: center; }
   nav { padding: 18px 22px; }
   nav.scrolled { padding: 14px 22px; }
-  .hero { padding: 120px 0 80px; }
-  .ef-card { padding: 40px 24px; }
-  .project-card-hero { grid-template-columns: 1fr; }
+  .hero { padding: 140px 0 80px; }
+  .ef-card { padding: 52px 28px; }
+  .project-card-hero { grid-template-columns: 1fr; padding: 32px 24px; }
   .phero-right { grid-row: auto; }
+  section { padding: 80px 0; }
 }
 
 /* HR */
@@ -1425,6 +1566,7 @@ footer {
 ::-webkit-scrollbar-track { background: var(--void); }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
 ::selection { background: rgba(16,185,129,0.2); color: white; }
+
 
 </style>
 </head>
@@ -1493,6 +1635,8 @@ footer {
 
 <main>
 
+
+
 <!-- ============================================================
      HERO
      ============================================================ -->
@@ -1508,17 +1652,25 @@ footer {
         <p class="hero-sub">
           Your morning shouldn't start with a platform announcement.
           <strong>My Commute</strong> monitors every TfL line in the background —
-          pulsing disruptions silently to your Dynamic Island before you leave the house.
-          <strong>Open it zero times. Know everything.</strong>
+          your <strong>Push Notification</strong> fires the moment disruption hits,
+          your <strong>Widget</strong> shows live line status without unlocking,
+          your <strong>Dynamic Island</strong> pulses as you walk out the door.
+          Three layers. Perfect coordination. <strong>Open it zero times. Know everything.</strong>
         </p>
         <div class="hero-ctas">
-          <button onclick="document.getElementById('story').scrollIntoView({behavior:'smooth'});return false;" class="btn-primary">
-            Read the story
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-              <path d="M6.5 1L12 6.5M12 6.5L6.5 12M12 6.5H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <a href="mailto:hello@ruuuview.com" class="btn-ghost">Get in touch</a>
+          <div class="hero-cta-wrap">
+            <button onclick="document.getElementById('story').scrollIntoView({behavior:'smooth'});return false;" class="btn-primary">
+              Read the story ›
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <path d="M6.5 1L12 6.5M12 6.5L6.5 12M12 6.5H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <span class="btn-micro">TAP TO EXPLORE</span>
+          </div>
+          <div class="hero-cta-wrap">
+            <a href="mailto:hello@ruuuview.com" class="btn-ghost">✉ Get in touch →</a>
+            <span class="btn-micro">TAP TO EXPLORE</span>
+          </div>
         </div>
       </div>
       <div class="hero-right">
@@ -1607,9 +1759,19 @@ footer {
                   <div class="digit-bottom"><div class="digit-char">O</div></div>
                   <div class="digit-split"></div><div class="digit-sheen"></div>
                 </div>
+                <div class="solari-digit" id="sd10">
+                  <div class="digit-top"><div class="digit-char">N</div></div>
+                  <div class="digit-bottom"><div class="digit-char">N</div></div>
+                  <div class="digit-split"></div><div class="digit-sheen"></div>
+                </div>
+                <div class="solari-digit" id="sd11">
+                  <div class="digit-top"><div class="digit-char">·</div></div>
+                  <div class="digit-bottom"><div class="digit-char">·</div></div>
+                  <div class="digit-split"></div><div class="digit-sheen"></div>
+                </div>
 
               </div>
-              <div style="font-family:var(--mono);font-size:9px;color:rgba(16,185,129,0.5);letter-spacing:0.16em;text-transform:uppercase;margin-top:10px;margin-bottom:20px;">MINS SAVED · BETA LIVE NOW</div>
+              <div style="font-family:var(--mono);font-size:9px;color:rgba(0,152,212,0.55);letter-spacing:0.16em;text-transform:uppercase;margin-top:10px;margin-bottom:0;">INTELLIGENCE · ALWAYS ON</div>
             </div>
           </div>
         </div>
@@ -1657,7 +1819,7 @@ footer {
         <div class="phero-left">
           <div>
             <div class="project-status status-building">
-              <div class="live-dot" style="width:5px;height:5px;" aria-hidden="true"></div>
+              <div class="live-dot" style="width:5px;height:5px;background:#0098D4;box-shadow:0 0 8px rgba(0,152,212,0.9);" aria-hidden="true"></div>
               iOS Beta Live
             </div>
           </div>
@@ -1668,13 +1830,17 @@ footer {
           <div class="project-desc">
             London has 1.4 million daily commuters making the same blind gamble every morning —
             leaving home without knowing if the tube is running. <strong>My Commute fixes that silently.</strong>
-            Dynamic Island alerts before you leave the house. Ambient line-status gradients.
-            Zero-latency search across 270+ stations. 14 lines watched, always.
-            <strong>You never open it. That's the whole point. V1 architecture complete. Ready to scale.</strong>
+            Three layers work in perfect coordination so you never have to open the app:
+            a <strong>Push Notification</strong> surfaces disruptions the moment they're detected —
+            a home-screen <strong>Widget</strong> shows your line's live status at a glance —
+            and a <strong>Dynamic Island alert</strong> pulses your commute signal as you walk out the door.
+            All three fire seamlessly together. <strong>Zero opens. Total awareness. V1 architecture complete. Ready to scale.</strong>
           </div>
           <div class="project-meta">
             <span class="project-tag">React Native</span>
             <span class="project-tag">TfL API</span>
+            <span class="project-tag">Push Notifications</span>
+            <span class="project-tag">Widget</span>
             <span class="project-tag">Dynamic Island</span>
             <span class="project-tag">14 lines · 270+ stations</span>
           </div>
@@ -1730,63 +1896,77 @@ footer {
       Why I build<br>the way I do.
     </h2>
 
-    <div class="story-sections">
+    <div class="story-chapters">
 
-      <!-- Tab nav -->
-      <div class="story-tabs reveal rv1" role="tablist" aria-label="Story chapters">
-        <button class="story-tab active" role="tab" aria-selected="true" aria-controls="story-panel-1" id="story-tab-1">
-          <span class="story-tab-num">01</span> The Origin
-        </button>
-        <button class="story-tab" role="tab" aria-selected="false" aria-controls="story-panel-2" id="story-tab-2">
-          <span class="story-tab-num">02</span> The Build
-        </button>
-        <button class="story-tab" role="tab" aria-selected="false" aria-controls="story-panel-3" id="story-tab-3">
-          <span class="story-tab-num">03</span> Full Circle
-        </button>
+      <!-- Chapter nav pills — click to expand chapter -->
+      <div class="story-chapter-nav reveal rv1">
+        <button class="story-chapter-pill" data-target="chapter-origin">01 · The Origin <span class="pill-indicator">[+]</span></button>
+        <button class="story-chapter-pill" data-target="chapter-build">02 · The Build <span class="pill-indicator">[+]</span></button>
+        <button class="story-chapter-pill" data-target="chapter-circle">03 · Full Circle <span class="pill-indicator">[+]</span></button>
       </div>
 
-      <!-- Panel 1 — Origin -->
-      <div class="story-panel active reveal rv2" id="story-panel-1" role="tabpanel" aria-labelledby="story-tab-1">
-        <div class="story-panel-label">
-          <div style="width:20px;height:0.5px;background:var(--emerald);opacity:0.6;"></div>
-          <div>The Origin</div>
-          <div class="story-panel-title">A broken Tube.<br>A brother. A decision.</div>
+      <!-- Chapter 01 -->
+      <div class="story-chapter reveal rv2" id="chapter-origin">
+        <div class="story-chapter-teaser" data-chapter="chapter-origin">
+          <span class="story-chapter-teaser-text">A broken Tube. A brother. A decision.</span>
+          <span class="teaser-toggle">[+]</span>
         </div>
-        <div class="story-body-text">
-          College → part-time job → running marketing for businesses — learning what makes people stop and pay attention.
-          Then one evening, watching my brother walk through the door exhausted after another unannounced Tube failure,
-          <strong>I decided to build the app London was missing.</strong>
-          No CS degree. No coding background. Not a single line of code written in my life before this.
-          Just obsession, AI as a co-pilot, and a problem worth solving.
-        </div>
-      </div>
-
-      <!-- Panel 2 — Build -->
-      <div class="story-panel" id="story-panel-2" role="tabpanel" aria-labelledby="story-tab-2">
-        <div class="story-panel-label">
-          <div style="width:20px;height:0.5px;background:var(--emerald);opacity:0.6;"></div>
-          <div>The Build</div>
-          <div class="story-panel-title">AI as co-pilot.<br>Zero prior code.</div>
-        </div>
-        <div class="story-body-text">
-          Built entirely with AI — React Native, the TfL API, Dynamic Island integration across 14 lines and 270+ stations.
-          <strong>A non-technical founder shipped a working app</strong> because the right tools exist now and the right problem was clear.
-          Every interaction was directed, not assembled. Every silence is deliberate.
-          The app never asks for your attention — it earns it before you even open it.
+        <div class="story-chapter-body">
+          <div class="story-chapter-num">Chapter 01 · The Origin</div>
+          <div class="story-chapter-grid">
+            <div class="story-chapter-label">A broken Tube.<br>A brother.<br>A decision.</div>
+            <div class="story-body-text">
+              College → part-time job → running marketing for businesses — learning what makes people stop and pay attention.
+              Then one evening, watching my brother walk through the door exhausted after another unannounced Tube failure,
+              <strong>I decided to build the app London was missing.</strong>
+              No CS degree. No coding background. Not a single line of code written in my life before this.
+              Just obsession, AI as a co-pilot, and a problem worth solving.
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Panel 3 — Full Circle -->
-      <div class="story-panel" id="story-panel-3" role="tabpanel" aria-labelledby="story-tab-3">
-        <div class="story-panel-label">
-          <div style="width:20px;height:0.5px;background:var(--emerald);opacity:0.6;"></div>
-          <div>Full Circle</div>
-          <div class="story-panel-title">172 years later.<br>The rails come home.</div>
+      <!-- Chapter 02 -->
+      <div class="story-chapter reveal rv3" id="chapter-build">
+        <div class="story-chapter-teaser" data-chapter="chapter-build">
+          <span class="story-chapter-teaser-text">AI as co-pilot. Zero prior code. Working app.</span>
+          <span class="teaser-toggle">[+]</span>
         </div>
-        <div class="story-hook">
-          April 16, 1853 — the British introduced railways to India.
-          2026 — an Indian founder is rewriting how Londoners navigate theirs.
-          <span class="hook-dim">Life comes full circle.</span>
+        <div class="story-chapter-body">
+          <div class="story-chapter-num">Chapter 02 · The Build</div>
+          <div class="story-chapter-grid">
+            <div class="story-chapter-label">AI as co-pilot.<br>Zero prior code.<br>Working app.</div>
+            <div class="story-body-text">
+              Built entirely with AI — React Native, the TfL API, Dynamic Island integration across 14 lines and 270+ stations.
+              <strong>A non-technical founder shipped a working app</strong> because the right tools exist now and the right problem was clear.
+              Every interaction was directed, not assembled. Every silence is deliberate.
+              The app never asks for your attention — it earns it before you even open it.
+              <br><br>
+              Funded by freelance SaaS work. Every client project teaches something that goes straight back into My Commute.
+              The hustle is the curriculum.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 03 -->
+      <div class="story-chapter origin reveal rv4" id="chapter-circle">
+        <div class="story-chapter-teaser" data-chapter="chapter-circle">
+          <span class="story-chapter-teaser-text">172 years later. The rails come home.</span>
+          <span class="teaser-toggle">[+]</span>
+        </div>
+        <div class="story-chapter-body">
+          <div class="story-chapter-num">Chapter 03 · Full Circle</div>
+          <div class="story-chapter-grid">
+            <div class="story-chapter-label">172 years later.<br>The rails<br>come home.</div>
+            <div>
+              <div class="story-hook">
+                On April 16, 1853, the British introduced railways to India.
+                <br>In 2026, an Indian founder is rewriting how Londoners navigate theirs.
+                <span class="hook-dim">Life comes full circle.</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1888,7 +2068,7 @@ footer {
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" style="padding-bottom:0;">
     <div class="footer-inner reveal">
       <div class="footer-left reveal rv1">
         <div class="footer-brand">MY COMMUTE</div>
@@ -1909,188 +2089,378 @@ footer {
     </div>
   </div>
 
-  <!-- Full-width tube rail — proper London Underground train -->
-  <div class="footer-tube" aria-label="London Underground train" role="img">
-    <div class="footer-rail-track">
-      <div class="footer-rail-sleepers"></div>
-      <div class="footer-rail-line-2"></div>
-      <div class="footer-rail-line"></div>
-      <div class="footer-train-wrap">
-        <!--
-          Authentic London Underground S/T Stock proportions:
-          - Rounded cab nose (not a bus rectangle)
-          - Visible carriage articulation joints
-          - Deep body with shallow windows
-          - Roof-mounted ventilation blisters
-          - Destination board on cab front
-          - Correct TfL blue + silver grey livery
-        -->
-        <svg class="tube-train-svg" viewBox="0 0 420 72" fill="none" xmlns="http://www.w3.org/2000/svg" width="420" height="72">
-          <defs>
-            <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#2a2a3a"/>
-              <stop offset="40%" stop-color="#1a1a28"/>
-              <stop offset="100%" stop-color="#0e0e18"/>
-            </linearGradient>
-            <linearGradient id="roofGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#3a3a4a"/>
-              <stop offset="100%" stop-color="#252535"/>
-            </linearGradient>
-            <radialGradient id="headlightGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="rgba(255,245,180,0.95)"/>
-              <stop offset="100%" stop-color="rgba(255,220,80,0)"/>
-            </radialGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
+  <!-- Fade bridge — seamlessly connects footer notes into station floor -->
+  <div style="height:32px;background:linear-gradient(180deg,var(--void) 0%,rgba(7,7,14,0.0) 100%);position:relative;z-index:1;margin-top:0;pointer-events:none;"></div>
 
-          <!-- === CAB (leading end, right side — train moves right) === -->
-          <!-- Cab body with rounded nose -->
-          <path d="M340 14 L400 14 Q416 14 418 28 Q419 42 400 48 L340 48 Z"
-                fill="url(#bodyGrad)" stroke="rgba(0,152,212,0.5)" stroke-width="0.8"/>
-          <!-- Cab roof curve -->
-          <path d="M340 14 L400 14 Q414 14 416 22 L416 16 Q414 8 400 8 L340 8 Z"
-                fill="url(#roofGrad)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
-          <!-- Cab TfL blue band -->
-          <path d="M340 18 L400 18 Q410 18 412 24 L340 24 Z"
-                fill="rgba(0,152,212,0.8)"/>
+  <!-- UNDERGROUND STATION SCENE — full width -->
+  <div class="footer-tube" aria-label="London Underground station scene" role="img">
+    <svg id="stationScene" viewBox="0 0 1200 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block;margin-top:-32px;">
+      <defs>
+        <linearGradient id="tunnelGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#000005"/>
+          <stop offset="18%" stop-color="#05050F"/>
+          <stop offset="100%" stop-color="#07070E"/>
+        </linearGradient>
+        <linearGradient id="platformGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0F0F1C"/>
+          <stop offset="100%" stop-color="#07070E"/>
+        </linearGradient>
+        <linearGradient id="trainBodyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1E1E2E"/>
+          <stop offset="45%" stop-color="#141422"/>
+          <stop offset="100%" stop-color="#0A0A14"/>
+        </linearGradient>
+        <linearGradient id="trainRoofGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2E2E42"/>
+          <stop offset="100%" stop-color="#1A1A28"/>
+        </linearGradient>
+        <radialGradient id="headlightBeam" cx="0%" cy="50%" r="100%">
+          <stop offset="0%" stop-color="rgba(255,245,180,0.9)"/>
+          <stop offset="40%" stop-color="rgba(255,230,120,0.3)"/>
+          <stop offset="100%" stop-color="rgba(255,220,80,0)"/>
+        </radialGradient>
+        <radialGradient id="tunnelGlow" cx="0%" cy="50%" r="100%">
+          <stop offset="0%" stop-color="rgba(0,152,212,0.25)"/>
+          <stop offset="100%" stop-color="rgba(0,152,212,0)"/>
+        </radialGradient>
+        <filter id="trainGlow">
+          <feGaussianBlur stdDeviation="2.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="softGlow">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <clipPath id="sceneClip">
+          <rect width="1200" height="200"/>
+        </clipPath>
+      </defs>
+
+      <g clip-path="url(#sceneClip)">
+
+        <!-- BACKGROUND — tunnel vault ceiling -->
+        <rect width="1200" height="200" fill="url(#tunnelGrad)"/>
+
+        <!-- Tunnel arch left — circular portal -->
+        <ellipse cx="-20" cy="110" rx="145" ry="105" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="12"/>
+        <ellipse cx="-20" cy="110" rx="125" ry="90" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="6"/>
+        <!-- Tunnel depth lines -->
+        <line x1="0" y1="20" x2="60" y2="35" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="200" x2="60" y2="165" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <!-- Headlight beam from tunnel -->
+        <ellipse cx="0" cy="108" rx="280" ry="60" fill="url(#headlightBeam)" opacity="0.6">
+          <animate attributeName="opacity" values="0.45;0.7;0.45" dur="2.8s" repeatCount="indefinite"/>
+        </ellipse>
+        <!-- Tunnel glow halo -->
+        <ellipse cx="10" cy="108" rx="120" ry="70" fill="url(#tunnelGlow)">
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/>
+        </ellipse>
+
+        <!-- PLATFORM FLOOR -->
+        <rect x="0" y="138" width="1200" height="42" fill="url(#platformGrad)"/>
+        <!-- Platform edge yellow line -->
+        <rect x="280" y="136" width="920" height="3" fill="#FFD300" opacity="0.55"/>
+        <!-- Platform floor tiles — subtle grid -->
+        <line x1="280" y1="138" x2="1200" y2="138" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+        <line x1="280" y1="155" x2="1200" y2="155" stroke="rgba(255,255,255,0.025)" stroke-width="0.5"/>
+        <line x1="280" y1="170" x2="1200" y2="170" stroke="rgba(255,255,255,0.025)" stroke-width="0.5"/>
+
+        <!-- Tile columns on platform -->
+        <rect x="340" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="420" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="500" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="580" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="660" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="740" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="820" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="900" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="980" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="1060" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+        <rect x="1140" y="138" width="1" height="42" fill="rgba(255,255,255,0.025)"/>
+
+        <!-- PLATFORM WALL — station tile panels -->
+        <rect x="280" y="30" width="920" height="108" fill="rgba(8,8,18,0.7)"/>
+        <!-- Wall tile horizontal stripes -->
+        <rect x="280" y="48" width="920" height="1" fill="rgba(255,255,255,0.035)"/>
+        <rect x="280" y="72" width="920" height="1" fill="rgba(255,255,255,0.035)"/>
+        <rect x="280" y="96" width="920" height="1" fill="rgba(255,255,255,0.035)"/>
+        <rect x="280" y="120" width="920" height="1" fill="rgba(255,255,255,0.035)"/>
+        <!-- Station roundel colour band on wall -->
+        <rect x="280" y="68" width="920" height="6" fill="rgba(0,152,212,0.18)" rx="0"/>
+        <!-- Station name on wall -->
+        <text x="640" y="100" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="700"
+              fill="rgba(255,255,255,0.45)" text-anchor="middle" letter-spacing="6">MY COMMUTE</text>
+
+        <!-- STATION LIGHTS — ceiling pendant lights on platform -->
+        <g opacity="0.7">
+          <!-- Light 1 -->
+          <line x1="380" y1="30" x2="380" y2="52" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <ellipse cx="380" cy="55" rx="10" ry="4" fill="rgba(255,255,200,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <ellipse cx="380" cy="56" rx="20" ry="8" fill="rgba(255,255,180,0.04)"/>
+          <!-- Light 2 -->
+          <line x1="560" y1="30" x2="560" y2="52" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <ellipse cx="560" cy="55" rx="10" ry="4" fill="rgba(255,255,200,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <ellipse cx="560" cy="56" rx="20" ry="8" fill="rgba(255,255,180,0.04)"/>
+          <!-- Light 3 -->
+          <line x1="740" y1="30" x2="740" y2="52" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <ellipse cx="740" cy="55" rx="10" ry="4" fill="rgba(255,255,200,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <ellipse cx="740" cy="56" rx="20" ry="8" fill="rgba(255,255,180,0.04)"/>
+          <!-- Light 4 -->
+          <line x1="920" y1="30" x2="920" y2="52" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <ellipse cx="920" cy="55" rx="10" ry="4" fill="rgba(255,255,200,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <ellipse cx="920" cy="56" rx="20" ry="8" fill="rgba(255,255,180,0.04)"/>
+          <!-- Light 5 -->
+          <line x1="1100" y1="30" x2="1100" y2="52" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <ellipse cx="1100" cy="55" rx="10" ry="4" fill="rgba(255,255,200,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <ellipse cx="1100" cy="56" rx="20" ry="8" fill="rgba(255,255,180,0.04)"/>
+        </g>
+
+        <!-- RAILS on the track -->
+        <rect x="0" y="133" width="1200" height="2.5" fill="rgba(255,255,255,0.06)" rx="1"/>
+        <rect x="0" y="126" width="1200" height="1.5" fill="rgba(255,255,255,0.04)" rx="1"/>
+        <!-- Rail sleepers -->
+        <g fill="rgba(255,255,255,0.03)">
+          <rect x="30" y="122" width="3" height="16" rx="1"/>
+          <rect x="60" y="122" width="3" height="16" rx="1"/>
+          <rect x="90" y="122" width="3" height="16" rx="1"/>
+          <rect x="120" y="122" width="3" height="16" rx="1"/>
+          <rect x="150" y="122" width="3" height="16" rx="1"/>
+          <rect x="180" y="122" width="3" height="16" rx="1"/>
+          <rect x="210" y="122" width="3" height="16" rx="1"/>
+          <rect x="240" y="122" width="3" height="16" rx="1"/>
+        </g>
+
+        <!-- WAITING PEOPLE — silhouettes on platform -->
+        <!-- Person 1: standing looking at phone -->
+        <g transform="translate(340, 90)" opacity="0.55">
+          <ellipse cx="0" cy="-24" rx="7" ry="7" fill="rgba(255,255,255,0.15)"/>
+          <rect x="-5" y="-17" width="10" height="28" rx="3" fill="rgba(255,255,255,0.12)"/>
+          <rect x="-4" y="-10" width="8" height="5" rx="1" fill="rgba(0,152,212,0.4)"/><!-- phone glow -->
+          <line x1="-8" y1="11" x2="-6" y2="48" stroke="rgba(255,255,255,0.1)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="8" y1="11" x2="6" y2="48" stroke="rgba(255,255,255,0.1)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <!-- Person 2: taller, arms down -->
+        <g transform="translate(400, 86)" opacity="0.45">
+          <ellipse cx="0" cy="-28" rx="8" ry="8" fill="rgba(255,255,255,0.13)"/>
+          <rect x="-6" y="-20" width="12" height="32" rx="3" fill="rgba(255,255,255,0.1)"/>
+          <line x1="-10" y1="12" x2="-8" y2="52" stroke="rgba(255,255,255,0.09)" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="10" y1="12" x2="8" y2="52" stroke="rgba(255,255,255,0.09)" stroke-width="3.5" stroke-linecap="round"/>
+        </g>
+        <!-- Person 3: small, child -->
+        <g transform="translate(448, 100)" opacity="0.4">
+          <ellipse cx="0" cy="-18" rx="5" ry="5" fill="rgba(255,255,255,0.12)"/>
+          <rect x="-4" y="-13" width="8" height="20" rx="3" fill="rgba(255,255,255,0.09)"/>
+          <line x1="-6" y1="7" x2="-5" y2="38" stroke="rgba(255,255,255,0.08)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="6" y1="7" x2="5" y2="38" stroke="rgba(255,255,255,0.08)" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+        <!-- Person 4: leaning, reading newspaper shape -->
+        <g transform="translate(510, 88)" opacity="0.5">
+          <ellipse cx="0" cy="-26" rx="7" ry="7" fill="rgba(255,255,255,0.14)"/>
+          <rect x="-6" y="-19" width="12" height="30" rx="3" fill="rgba(255,255,255,0.11)"/>
+          <!-- paper raised -->
+          <rect x="-14" y="-22" width="12" height="16" rx="1" fill="rgba(255,255,255,0.06)" transform="rotate(-8)"/>
+          <line x1="-9" y1="11" x2="-7" y2="50" stroke="rgba(255,255,255,0.09)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="11" x2="7" y2="50" stroke="rgba(255,255,255,0.09)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <!-- Person 5: far right, looking left toward tunnel -->
+        <g transform="translate(620, 89)" opacity="0.38">
+          <ellipse cx="0" cy="-25" rx="7" ry="7" fill="rgba(255,255,255,0.12)"/>
+          <rect x="-5" y="-18" width="10" height="28" rx="3" fill="rgba(255,255,255,0.09)"/>
+          <line x1="-8" y1="10" x2="-7" y2="49" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="8" y1="10" x2="7" y2="49" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <!-- Person 6: backpack shape -->
+        <g transform="translate(700, 91)" opacity="0.35">
+          <ellipse cx="0" cy="-22" rx="7" ry="7" fill="rgba(255,255,255,0.11)"/>
+          <rect x="-7" y="-15" width="14" height="26" rx="3" fill="rgba(255,255,255,0.09)"/>
+          <!-- backpack -->
+          <rect x="5" y="-12" width="8" height="18" rx="3" fill="rgba(255,255,255,0.05)"/>
+          <line x1="-9" y1="11" x2="-8" y2="47" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="11" x2="8" y2="47" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+
+        <!-- DEPARTURE BOARD on wall -->
+        <rect x="820" y="45" width="160" height="70" rx="4" fill="rgba(4,4,20,0.98)" stroke="rgba(0,152,212,0.7)" stroke-width="1.5"/>
+        <rect x="820" y="45" width="160" height="14" rx="4" fill="rgba(0,152,212,0.35)"/>
+        <text x="900" y="56" font-family="Space Mono,monospace" font-size="7" fill="rgba(0,152,212,1)" text-anchor="middle" letter-spacing="2">DEPARTURES</text>
+        <text x="835" y="72" font-family="Space Mono,monospace" font-size="8" fill="rgba(255,255,255,0.9)" letter-spacing="1">LAUNCH</text>
+        <text x="960" y="72" font-family="Space Mono,monospace" font-size="8" fill="rgba(34,197,94,1)" text-anchor="end" letter-spacing="1">ON TIME</text>
+        <text x="835" y="86" font-family="Space Mono,monospace" font-size="8" fill="rgba(255,255,255,0.75)" letter-spacing="1">EF LONDON</text>
+        <text x="960" y="86" font-family="Space Mono,monospace" font-size="8" fill="rgba(245,158,11,0.95)" text-anchor="end" letter-spacing="1">2 MINS</text>
+        <text x="835" y="100" font-family="Space Mono,monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1">SCALE UP</text>
+        <text x="960" y="100" font-family="Space Mono,monospace" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="end" letter-spacing="1">SEE YOU</text>
+
+        <!-- THE TRAIN — emerges from left tunnel, always exits fully right -->
+        <g id="footerTrain">
+          <animateTransform attributeName="transform" type="translate"
+            values="-500,0; 1700,0" dur="7s" repeatCount="indefinite"
+            calcMode="spline" keyTimes="0;1"
+            keySplines="0.2,0.0,0.8,1.0"/>
+
+          <!-- HEADLIGHT CONE — precedes the train -->
+          <ellipse cx="475" cy="108" rx="48" ry="22" fill="rgba(255,245,180,0.18)">
+            <animate attributeName="opacity" values="0.8;1;0.8" dur="1.8s" repeatCount="indefinite"/>
+          </ellipse>
+
+          <!-- TRAIN BODY — 3 carriages + cab -->
+          <!-- Carriage 3 (tail) -->
+          <rect x="0" y="60" width="118" height="6" rx="1" fill="url(#trainRoofGrad)"/>
+          <rect x="0" y="66" width="118" height="54" rx="2" fill="url(#trainBodyGrad)" stroke="rgba(0,152,212,0.3)" stroke-width="0.8"/>
+          <rect x="0" y="70" width="118" height="8" fill="rgba(0,152,212,0.65)"/>
+          <!-- Windows carriage 3 -->
+          <rect x="10" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <rect x="44" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <rect x="78" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <!-- Door lines -->
+          <line x1="38" y1="66" x2="38" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <line x1="76" y1="66" x2="76" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <!-- Bogies -->
+          <rect x="10" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="18" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 18 128;360 18 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="18" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="34" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 34 128;360 34 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="34" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <rect x="72" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="80" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 80 128;360 80 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="80" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="96" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 96 128;360 96 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="96" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <!-- Tail red lights -->
+          <circle cx="3" cy="80" r="3" fill="rgba(220,30,30,0.75)" filter="url(#trainGlow)">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="3" cy="98" r="3" fill="rgba(220,30,30,0.75)" filter="url(#trainGlow)">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Articulation joint 3→2 -->
+          <rect x="118" y="74" width="5" height="46" rx="1" fill="rgba(0,0,0,0.9)"/>
+
+          <!-- Carriage 2 -->
+          <rect x="123" y="60" width="118" height="6" rx="1" fill="url(#trainRoofGrad)"/>
+          <rect x="123" y="66" width="118" height="54" rx="2" fill="url(#trainBodyGrad)" stroke="rgba(0,152,212,0.3)" stroke-width="0.8"/>
+          <rect x="123" y="70" width="118" height="8" fill="rgba(0,152,212,0.65)"/>
+          <rect x="133" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <rect x="167" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <rect x="201" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <line x1="161" y1="66" x2="161" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <line x1="199" y1="66" x2="199" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <!-- Bogies -->
+          <rect x="133" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="141" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 141 128;360 141 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="141" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="157" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 157 128;360 157 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="157" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <rect x="195" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="203" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 203 128;360 203 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="203" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="219" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 219 128;360 219 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="219" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+
+          <!-- Articulation joint 2→1 -->
+          <rect x="241" y="74" width="5" height="46" rx="1" fill="rgba(0,0,0,0.9)"/>
+
+          <!-- Carriage 1 -->
+          <rect x="246" y="60" width="118" height="6" rx="1" fill="url(#trainRoofGrad)"/>
+          <rect x="246" y="66" width="118" height="54" rx="2" fill="url(#trainBodyGrad)" stroke="rgba(0,152,212,0.3)" stroke-width="0.8"/>
+          <rect x="246" y="70" width="118" height="8" fill="rgba(0,152,212,0.65)"/>
+          <rect x="256" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <rect x="290" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <rect x="324" y="82" width="26" height="20" rx="2" fill="rgba(140,200,255,0.07)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <line x1="284" y1="66" x2="284" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <line x1="322" y1="66" x2="322" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <rect x="258" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="266" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 266 128;360 266 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="266" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="282" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 282 128;360 282 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="282" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <rect x="320" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="328" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 328 128;360 328 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="328" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="344" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 344 128;360 344 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="344" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+
+          <!-- Articulation joint 1→cab -->
+          <rect x="364" y="74" width="5" height="46" rx="1" fill="rgba(0,0,0,0.9)"/>
+
+          <!-- CAB (leading, right side) -->
+          <path d="M369 60 L450 60 Q470 60 476 78 Q478 96 462 120 L369 120 Z"
+                fill="url(#trainBodyGrad)" stroke="rgba(0,152,212,0.4)" stroke-width="0.8"/>
+          <rect x="369" y="60" width="81" height="6" rx="1" fill="url(#trainRoofGrad)"/>
+          <!-- Cab blue band -->
+          <path d="M369 70 L450 70 Q462 70 466 78 L369 78 Z" fill="rgba(0,152,212,0.72)"/>
           <!-- Cab front face -->
-          <path d="M400 14 Q418 14 419 28 Q419 42 400 48 L400 14 Z"
-                fill="#0f0f1e" stroke="rgba(0,152,212,0.4)" stroke-width="0.8"/>
-          <!-- Destination blind (front top) -->
-          <rect x="403" y="16" width="13" height="7" rx="1" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
-          <text x="409.5" y="21.5" font-family="Space Mono,monospace" font-size="3.5" fill="rgba(255,255,255,0.6)" text-anchor="middle">EC2</text>
-          <!-- Cab windows (angled) -->
-          <path d="M388 20 L408 20 Q412 20 412 24 L412 30 Q412 32 410 32 L388 32 Z"
-                fill="rgba(160,210,255,0.09)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+          <path d="M450 60 Q475 60 477 85 Q477 110 455 120 L450 60 Z" fill="#0A0A16" stroke="rgba(0,152,212,0.35)" stroke-width="0.8"/>
+          <!-- Destination blind -->
+          <rect x="455" y="63" width="17" height="9" rx="1.5" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+          <text x="463.5" y="70" font-family="Space Mono,monospace" font-size="4" fill="rgba(255,255,255,0.55)" text-anchor="middle">LAUNCH</text>
+          <!-- Cab window -->
+          <path d="M420 75 L458 75 Q465 75 466 82 L466 96 Q465 99 460 99 L420 99 Z"
+                fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
           <!-- Headlights -->
-          <circle cx="414" cy="26" r="4" fill="url(#headlightGlow)" filter="url(#glow)">
-            <animate attributeName="opacity" values="0.85;1;0.85" dur="2s" repeatCount="indefinite"/>
+          <circle cx="470" cy="80" r="5.5" fill="rgba(255,245,180,0.9)" filter="url(#softGlow)">
+            <animate attributeName="opacity" values="0.85;1;0.85" dur="1.8s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="414" cy="36" r="2.5" fill="rgba(255,80,80,0.7)" filter="url(#glow)"/>
-          <!-- Cab front marker light -->
-          <circle cx="402" cy="44" r="2" fill="rgba(255,200,0,0.5)"/>
-
-          <!-- === CARRIAGE 1 (rightmost, behind cab) === -->
-          <rect x="252" y="8" width="88" height="6" rx="1" fill="url(#roofGrad)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <rect x="252" y="14" width="88" height="34" fill="url(#bodyGrad)" stroke="rgba(0,152,212,0.35)" stroke-width="0.8"/>
-          <!-- Blue band -->
-          <rect x="252" y="18" width="88" height="6" fill="rgba(0,152,212,0.7)"/>
-          <!-- Windows -->
-          <rect x="260" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <rect x="286" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <rect x="312" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <!-- Door divider -->
-          <line x1="280" y1="18" x2="280" y2="48" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
-          <line x1="308" y1="18" x2="308" y2="48" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
-          <!-- Roof blister -->
-          <ellipse cx="285" cy="10" rx="8" ry="3" fill="rgba(80,80,100,0.4)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <ellipse cx="318" cy="10" rx="8" ry="3" fill="rgba(80,80,100,0.4)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-
-          <!-- Articulation joint 1→2 -->
-          <rect x="248" y="20" width="4" height="28" rx="1" fill="rgba(0,0,0,0.8)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-
-          <!-- === CARRIAGE 2 === -->
-          <rect x="160" y="8" width="88" height="6" rx="1" fill="url(#roofGrad)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <rect x="160" y="14" width="88" height="34" fill="url(#bodyGrad)" stroke="rgba(0,152,212,0.35)" stroke-width="0.8"/>
-          <rect x="160" y="18" width="88" height="6" fill="rgba(0,152,212,0.7)"/>
-          <rect x="168" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <rect x="194" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <rect x="220" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <line x1="188" y1="18" x2="188" y2="48" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
-          <line x1="216" y1="18" x2="216" y2="48" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
-          <ellipse cx="190" cy="10" rx="8" ry="3" fill="rgba(80,80,100,0.4)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <ellipse cx="225" cy="10" rx="8" ry="3" fill="rgba(80,80,100,0.4)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-
-          <!-- Articulation joint 2→3 -->
-          <rect x="156" y="20" width="4" height="28" rx="1" fill="rgba(0,0,0,0.8)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-
-          <!-- === CARRIAGE 3 === -->
-          <rect x="68" y="8" width="88" height="6" rx="1" fill="url(#roofGrad)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <rect x="68" y="14" width="88" height="34" fill="url(#bodyGrad)" stroke="rgba(0,152,212,0.35)" stroke-width="0.8"/>
-          <rect x="68" y="18" width="88" height="6" fill="rgba(0,152,212,0.7)"/>
-          <rect x="76" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <rect x="102" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <rect x="128" y="28" width="20" height="13" rx="2" fill="rgba(160,215,255,0.08)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
-          <line x1="96" y1="18" x2="96" y2="48" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
-          <line x1="124" y1="18" x2="124" y2="48" stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
-          <ellipse cx="100" cy="10" rx="8" ry="3" fill="rgba(80,80,100,0.4)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <ellipse cx="134" cy="10" rx="8" ry="3" fill="rgba(80,80,100,0.4)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-
-          <!-- Articulation joint 3→tail -->
-          <rect x="64" y="20" width="4" height="28" rx="1" fill="rgba(0,0,0,0.8)" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-
-          <!-- === TAIL CAB (left, blunt non-driving end) === -->
-          <path d="M4 14 Q2 14 2 28 Q2 42 4 48 L64 48 L64 14 Z"
-                fill="url(#bodyGrad)" stroke="rgba(0,152,212,0.4)" stroke-width="0.8"/>
-          <rect x="4" y="8" width="60" height="6" rx="1" fill="url(#roofGrad)"/>
-          <path d="M4 18 Q2 18 2 28 L2 28 L4 18 L64 18 L64 24 L4 24 Z"
-                fill="rgba(0,152,212,0.6)"/>
-          <!-- Tail rear marker lights -->
-          <circle cx="5" cy="24" r="2.5" fill="rgba(220,30,30,0.8)" filter="url(#glow)">
-            <animate attributeName="opacity" values="0.7;1;0.7" dur="2.4s" repeatCount="indefinite"/>
+          <circle cx="470" cy="100" r="3.5" fill="rgba(255,80,80,0.65)" filter="url(#trainGlow)"/>
+          <!-- Cab bogies -->
+          <rect x="385" y="118" width="36" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="393" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 393 128;360 393 128" dur="0.6s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="5" cy="38" r="2.5" fill="rgba(220,30,30,0.8)" filter="url(#glow)">
-            <animate attributeName="opacity" values="0.7;1;0.7" dur="2.4s" begin="0.6s" repeatCount="indefinite"/>
+          <circle cx="393" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="409" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 409 128;360 409 128" dur="0.6s" repeatCount="indefinite"/>
           </circle>
-          <!-- Tail windows -->
-          <rect x="14" y="28" width="18" height="13" rx="2" fill="rgba(160,215,255,0.06)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
-          <rect x="38" y="28" width="18" height="13" rx="2" fill="rgba(160,215,255,0.06)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+          <circle cx="409" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <rect x="430" y="118" width="30" height="5" rx="2" fill="rgba(20,20,40,0.9)"/>
+          <circle cx="438" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 438 128;360 438 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="438" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
+          <circle cx="452" cy="128" r="8" fill="#08081A" stroke="rgba(0,152,212,0.45)" stroke-width="1.2">
+            <animateTransform attributeName="transform" type="rotate" values="0 452 128;360 452 128" dur="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="452" cy="128" r="3" fill="rgba(0,152,212,0.3)"/>
 
-          <!-- === BOGIES / WHEELS (all carriages) === -->
-          <!-- Tail bogie -->
-          <rect x="8" y="46" width="30" height="6" rx="2" fill="rgba(30,30,50,0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
-          <circle class="train-wheel" cx="16" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="16" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="16" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <circle class="train-wheel" cx="32" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="32" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="32" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <!-- Carriage 3 bogie -->
-          <rect x="90" y="46" width="30" height="6" rx="2" fill="rgba(30,30,50,0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
-          <circle class="train-wheel" cx="98" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="98" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="98" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <circle class="train-wheel" cx="114" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="114" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="114" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <!-- Carriage 2 bogie -->
-          <rect x="182" y="46" width="30" height="6" rx="2" fill="rgba(30,30,50,0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
-          <circle class="train-wheel" cx="190" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="190" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="190" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <circle class="train-wheel" cx="206" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="206" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="206" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <!-- Carriage 1 bogie -->
-          <rect x="274" y="46" width="30" height="6" rx="2" fill="rgba(30,30,50,0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
-          <circle class="train-wheel" cx="282" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="282" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="282" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <circle class="train-wheel" cx="298" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="298" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="298" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <!-- Cab bogie -->
-          <rect x="356" y="46" width="30" height="6" rx="2" fill="rgba(30,30,50,0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
-          <circle class="train-wheel" cx="364" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="364" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="364" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-          <circle class="train-wheel" cx="380" cy="54" r="7" fill="#0d0d1a" stroke="rgba(0,152,212,0.5)" stroke-width="1.2"/>
-          <circle cx="380" cy="54" r="3" fill="rgba(0,152,212,0.3)"/>
-          <circle cx="380" cy="54" r="1" fill="rgba(255,255,255,0.3)"/>
-        </svg>
-      </div>
-    </div>
-    <div class="footer-station-labels">
-      <span>◉ KING'S CROSS ST. PANCRAS</span>
-      <span>BANK ◉</span>
-      <span>CANARY WHARF ◉</span>
-      <span>STRATFORD ◉</span>
-    </div>
+        </g>
+
+        <!-- Station labels -->
+        <text x="40" y="170" font-family="Space Mono,monospace" font-size="7"
+              fill="rgba(0,152,212,0.35)" letter-spacing="2" text-anchor="middle">◉ TUNNEL</text>
+        <text x="460" y="170" font-family="Space Mono,monospace" font-size="7"
+              fill="rgba(255,255,255,0.55)" letter-spacing="2" text-anchor="middle">MY COMMUTE STATION</text>
+        <text x="1160" y="170" font-family="Space Mono,monospace" font-size="7"
+              fill="rgba(0,152,212,0.2)" letter-spacing="2" text-anchor="end">LAUNCH ◉</text>
+
+      </g>
+    </svg>
   </div>
 </footer>
+
 
 <!-- ============================================================
      SCRIPTS
@@ -2243,19 +2613,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
    10 digits: 6 left · 4 right of separator
    ============================================================ */
 (function() {
-  const ids = ['sd0','sd1','sd2','sd3','sd4','sd5','sd6','sd7','sd8','sd9'];
+  const ids = ['sd0','sd1','sd2','sd3','sd4','sd5','sd6','sd7','sd8','sd9','sd10','sd11'];
   const els = ids.map(id => document.getElementById(id));
   const chars = '0123456789ABCDEFGHJKLMNPRSTUVWXYZ·-';
 
-  // 10-char words: 6 left of colon · 4 right
-  // Format: ['C','O','M','I','N','G','S','O','O','N']
+  // 12-char words
   const words = [
-    ['B','U','I','L','T','·','S','O','L','O'],  // BUILT · SOLO
-    ['N','E','V','E','R','·','O','P','E','N'],  // NEVER · OPEN
-    ['A','L','W','A','Y','S','·','O','N','·'],  // ALWAYS · ON
-    ['1','4','·','L','I','N','E','S','·','·'],  // 14 · LINES
-    ['I','O','S','·','B','E','T','A','·','·'],  // IOS · BETA
-    ['E','F','·','L','O','N','D','O','N','·'],  // EF · LONDON
+    ['Y','O','U','R','·','C','O','M','M','U','T','E'],  // YOUR COMMUTE
+    ['A','S','S','I','S','T','A','N','T','·','·','·'],  // ASSISTANT
+    ['A','L','W','A','Y','S','·','O','N','·','·','·'],  // ALWAYS · ON
+    ['C','O','M','I','N','G','·','S','O','O','N','·'],  // COMING SOON
+    ['L','O','N','D','O','N','·','🇬','🇧','·','·','·'],  // LONDON 🇬🇧
   ];
   let wordIdx = 0;
 
@@ -2315,7 +2683,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
 
   // Rotate status bar messages — with meaningful TfL status context
   const messages = [
-    { html: '<strong>iOS Beta Live</strong> · My Commute is watching so you don\'t have to', status: 'green' },
+    { html: '<strong>iOS Beta Live</strong> · My Commute is watching so you don\'t have to', status: 'blue' },
     { html: '<strong>14 TfL lines</strong> monitored · 270+ stations · Dynamic Island active', status: 'neutral' },
     { html: '<strong>Built solo.</strong> Zero CS degree. Zero prior code. Working app.', status: 'neutral' },
     { html: '<strong>Minor delays</strong> · Circle & District — plan an extra 8 mins', status: 'amber' },
@@ -2323,6 +2691,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
     { html: '<strong>V1 complete.</strong> Looking for a technical co-founder at EF London \'26', status: 'neutral' },
   ];
   const statusStyles = {
+    blue:    { dot: '#0098D4', shadow: 'rgba(0,152,212,0.9)',  strong: '#0098D4' },
     green:   { dot: '#10B981', shadow: 'rgba(16,185,129,0.8)', strong: '#10B981' },
     amber:   { dot: '#F59E0B', shadow: 'rgba(245,158,11,0.8)', strong: '#F59E0B' },
     red:     { dot: '#EF4444', shadow: 'rgba(239,68,68,0.9)',  strong: '#EF4444' },
@@ -2469,31 +2838,137 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
 
 
 /* ============================================================
-   STORY TABS — interactive chapter switching
+   NAV LINE PILLS — Fix 1: Synced global heartbeat, simultaneous 3D flip
    ============================================================ */
 (function() {
-  const tabs = document.querySelectorAll('.story-tab');
-  const panels = document.querySelectorAll('.story-panel');
-  tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected','true');
-      const panel = document.getElementById(tab.getAttribute('aria-controls'));
-      if (panel) {
-        panel.classList.add('active');
-        panel.style.opacity = '0';
-        panel.style.transform = 'translateY(12px)';
-        requestAnimationFrame(() => {
-          panel.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-          panel.style.opacity = '1';
-          panel.style.transform = 'translateY(0)';
-        });
+  const ALL_LINES = [
+    { cls: 'nl-bakerloo',    label: 'Bakerloo'    },
+    { cls: 'nl-central',     label: 'Central'     },
+    { cls: 'nl-circle',      label: 'Circle'      },
+    { cls: 'nl-district',    label: 'District'    },
+    { cls: 'nl-hammersmith', label: 'H&C'         },
+    { cls: 'nl-jubilee',     label: 'Jubilee'     },
+    { cls: 'nl-metropolitan',label: 'Metropolitan'},
+    { cls: 'nl-northern',    label: 'Northern'    },
+    { cls: 'nl-piccadilly',  label: 'Piccadilly'  },
+    { cls: 'nl-victoria',    label: 'Victoria'    },
+    { cls: 'nl-elizabeth',   label: 'Elizabeth'   },
+    { cls: 'nl-dlr',         label: 'DLR'         },
+    { cls: 'nl-overground',  label: 'Overground'  },
+    { cls: 'nl-waterloo',    label: 'Waterloo & City' },
+  ];
+
+  const pills = document.querySelectorAll('.nav-line-pill');
+  if (!pills.length) return;
+
+  // Each pill starts at a different position so they show different lines
+  const indices = Array.from(pills).map((_, i) => i % ALL_LINES.length);
+
+  // Sync all pills: advance simultaneously on the same global timer
+  const INTERVAL = 3000; // match CSS animation duration
+  const FLIP_MID = INTERVAL * 0.92; // moment of label swap = mid-flip (92% in)
+
+  function swapContent(pill, idx) {
+    const line = ALL_LINES[idx];
+    ALL_LINES.forEach(l => pill.classList.remove(l.cls));
+    pill.classList.add(line.cls);
+    pill.textContent = line.label;
+  }
+
+  // Initialize immediately
+  pills.forEach((pill, i) => swapContent(pill, indices[i]));
+
+  // Global heartbeat — all flip at once
+  setInterval(() => {
+    // Swap label at the exact mid-flip point (92% through the keyframe)
+    setTimeout(() => {
+      pills.forEach((pill, i) => {
+        indices[i] = (indices[i] + 1) % ALL_LINES.length;
+        swapContent(pill, indices[i]);
+      });
+    }, INTERVAL * 0.92);
+  }, INTERVAL);
+})();
+
+
+/* ============================================================
+   STORY ACCORDION — Fix 3: Mutually exclusive expand/collapse
+   ============================================================ */
+(function() {
+  function openChapter(id) {
+    // Close all first
+    document.querySelectorAll('.story-chapter').forEach(ch => {
+      ch.classList.remove('open');
+      const toggle = ch.querySelector('.teaser-toggle');
+      if (toggle) toggle.textContent = '[+]';
+    });
+    // Update all nav pills
+    document.querySelectorAll('.story-chapter-pill').forEach(p => {
+      p.classList.remove('active');
+      const ind = p.querySelector('.pill-indicator');
+      if (ind) ind.textContent = '[+]';
+    });
+
+    const chapter = document.getElementById(id);
+    if (!chapter) return;
+
+    chapter.classList.add('open');
+    const toggle = chapter.querySelector('.teaser-toggle');
+    if (toggle) toggle.textContent = '[-]';
+
+    // Sync pill
+    const pill = document.querySelector(`.story-chapter-pill[data-target="${id}"]`);
+    if (pill) {
+      pill.classList.add('active');
+      const ind = pill.querySelector('.pill-indicator');
+      if (ind) ind.textContent = '[-]';
+    }
+  }
+
+  // Nav pill clicks
+  document.querySelectorAll('.story-chapter-pill[data-target]').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const targetId = pill.dataset.target;
+      const chapter = document.getElementById(targetId);
+      if (chapter && chapter.classList.contains('open')) {
+        // Toggle off
+        chapter.classList.remove('open');
+        pill.classList.remove('active');
+        const toggle = chapter.querySelector('.teaser-toggle');
+        if (toggle) toggle.textContent = '[+]';
+        const ind = pill.querySelector('.pill-indicator');
+        if (ind) ind.textContent = '[+]';
+      } else {
+        openChapter(targetId);
+        // Smooth scroll into view
+        setTimeout(() => chapter.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      }
+    });
+  });
+
+  // Teaser row clicks
+  document.querySelectorAll('.story-chapter-teaser').forEach(teaser => {
+    teaser.addEventListener('click', () => {
+      const id = teaser.dataset.chapter;
+      const chapter = document.getElementById(id);
+      if (chapter && chapter.classList.contains('open')) {
+        chapter.classList.remove('open');
+        const toggle = chapter.querySelector('.teaser-toggle');
+        if (toggle) toggle.textContent = '[+]';
+        const pill = document.querySelector(`.story-chapter-pill[data-target="${id}"]`);
+        if (pill) {
+          pill.classList.remove('active');
+          const ind = pill.querySelector('.pill-indicator');
+          if (ind) ind.textContent = '[+]';
+        }
+      } else {
+        openChapter(id);
       }
     });
   });
 })();
+
+
 
 
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
