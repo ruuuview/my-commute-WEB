@@ -615,7 +615,7 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 .solari-board {
   background: #05050D;
   border-radius: 21px;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
@@ -673,18 +673,20 @@ body.cursor-active .cursor-lens { opacity: 0.92; }
 .solari-departures-bar span { color: rgba(255,255,255,0.1); }
 
 .solari-display {
-  padding: 26px 22px 18px;
+  padding: 26px 20px 18px;
   background: #04040C;
+  overflow: visible;
 }
 
-/* ---- Solari digits — 10-wide board ---- */
+/* ---- Solari digits — 12-wide board ---- */
 .solari-digits {
   display: flex; gap: 3px; align-items: center;
   margin-bottom: 22px;
+  overflow: visible;
 }
 .solari-digit {
-  width: 40px; height: 72px;
-  position: relative; border-radius: 8px; overflow: hidden;
+  width: 36px; height: 68px;
+  position: relative; border-radius: 7px; overflow: hidden;
   flex-shrink: 0;
   box-shadow:
     0 4px 24px rgba(0,0,0,0.98),
@@ -1173,26 +1175,38 @@ section { padding: 120px 0; }
 .story-chapter-pill {
   font-family: var(--mono); font-size: 9px; font-weight: 700;
   letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--t3); padding: 6px 14px;
-  border: 0.5px solid var(--border); border-radius: var(--rp);
-  background: var(--surface-1); text-decoration: none;
-  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.35s var(--spring);
+  color: rgba(255,255,255,0.6); padding: 8px 16px;
+  border: 0.5px solid rgba(255,255,255,0.18); border-radius: var(--rp);
+  background: rgba(255,255,255,0.06); text-decoration: none;
+  transition: color 0.25s, border-color 0.25s, background 0.25s, transform 0.35s var(--spring), box-shadow 0.3s;
   cursor: none; display: inline-flex; align-items: center; gap: 8px;
 }
-.story-chapter-pill:hover { color: var(--t1); border-color: var(--border-bright); background: var(--surface-2); transform: translateY(-2px); }
-.story-chapter-pill.active { color: var(--t1); border-color: rgba(16,185,129,0.5); background: rgba(16,185,129,0.07); }
+.story-chapter-pill:hover {
+  color: var(--t1);
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.story-chapter-pill.active {
+  color: var(--emerald);
+  border-color: rgba(16,185,129,0.55);
+  background: rgba(16,185,129,0.1);
+  box-shadow: 0 0 20px rgba(16,185,129,0.12);
+}
 .pill-indicator { font-size: 11px; font-weight: 400; opacity: 0.7; transition: transform 0.3s var(--spring); }
 .story-chapter-pill.active .pill-indicator { transform: rotate(45deg); }
 
 /* Each chapter block */
 .story-chapter {
-  border-left: 1.5px solid rgba(255,255,255,0.06);
+  border-left: 2px solid rgba(255,255,255,0.07);
   padding: 0 0 0 40px;
   position: relative;
-  transition: border-color 0.4s;
+  transition: border-color 0.35s;
   overflow: hidden;
 }
-.story-chapter:hover { border-color: rgba(16,185,129,0.25); }
+.story-chapter:hover { border-color: rgba(16,185,129,0.35); }
+.story-chapter.open  { border-color: rgba(16,185,129,0.6); }
 .story-chapter::before {
   content: '';
   position: absolute; left: -5px; top: 20px;
@@ -1213,24 +1227,103 @@ section { padding: 120px 0; }
 
 /* Teaser (always visible) */
 .story-chapter-teaser {
-  padding: 22px 0 22px;
+  padding: 28px 0 28px;
   display: flex; align-items: center; justify-content: space-between;
   cursor: none;
   user-select: none;
+  gap: 24px;
 }
+.story-chapter-teaser-inner {
+  display: flex; align-items: baseline; gap: 16px; flex: 1; min-width: 0;
+}
+.story-chapter-teaser-num {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--emerald); opacity: 0.55; flex-shrink: 0;
+  transition: opacity 0.25s;
+}
+.story-chapter:hover .story-chapter-teaser-num,
+.story-chapter.open .story-chapter-teaser-num { opacity: 1; }
 .story-chapter-teaser-text {
+  font-family: var(--display); font-size: clamp(20px, 2.8vw, 28px); font-weight: 600;
+  letter-spacing: -0.025em;
+  color: rgba(255,255,255,0.75);
+  transition: color 0.3s, letter-spacing 0.35s var(--ease), text-shadow 0.3s;
+  line-height: 1.15;
+  position: relative;
+}
+.story-chapter:hover .story-chapter-teaser-text {
+  color: rgba(255,255,255,1);
+  letter-spacing: -0.028em;
+  text-shadow: 0 0 32px rgba(255,255,255,0.15);
+}
+.story-chapter.open .story-chapter-teaser-text {
+  color: var(--t1);
+  text-shadow: 0 0 40px rgba(255,255,255,0.12);
+}
+
+/* Expand hint — fades in on hover */
+.teaser-expand-hint {
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--emerald); opacity: 0;
+  display: block; margin-top: 5px;
+  transition: opacity 0.25s var(--ease), transform 0.3s var(--ease);
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+.story-chapter:not(.open):hover .teaser-expand-hint {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+/* Chapter number — more punchy */
+.story-chapter-teaser-num {
   font-family: var(--mono); font-size: 10px; font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--t3);
-  transition: color 0.2s;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--emerald); opacity: 0.7; flex-shrink: 0;
+  transition: opacity 0.25s, text-shadow 0.25s;
 }
-.story-chapter:hover .story-chapter-teaser-text,
-.story-chapter.open .story-chapter-teaser-text { color: var(--t2); }
+.story-chapter:hover .story-chapter-teaser-num,
+.story-chapter.open .story-chapter-teaser-num {
+  opacity: 1;
+  text-shadow: 0 0 16px rgba(16,185,129,0.6);
+}
+
+/* Idle glow pulse on the toggle to invite interaction */
+@keyframes toggleIdlePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); border-color: rgba(255,255,255,0.18); }
+  50%       { box-shadow: 0 0 14px 2px rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.38); }
+}
+
 .teaser-toggle {
-  font-family: var(--mono); font-size: 13px; font-weight: 700;
-  color: var(--t3); transition: color 0.2s, transform 0.35s var(--spring);
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  font-family: var(--mono); font-size: 18px; font-weight: 700; line-height: 1;
+  color: rgba(255,255,255,0.55);
+  transition: color 0.25s, border-color 0.25s, background 0.25s, transform 0.45s var(--spring), box-shadow 0.3s;
+  animation: toggleIdlePulse 3s ease-in-out infinite;
 }
-.story-chapter.open .teaser-toggle { color: var(--emerald); transform: rotate(45deg); }
+.story-chapter:hover .teaser-toggle {
+  color: var(--t1);
+  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.09);
+  box-shadow: 0 0 20px rgba(255,255,255,0.1);
+  animation: none;
+}
+.story-chapter.open .teaser-toggle {
+  color: var(--emerald);
+  border-color: rgba(16,185,129,0.65);
+  background: rgba(16,185,129,0.12);
+  box-shadow: 0 0 22px rgba(16,185,129,0.28);
+  transform: rotate(45deg);
+  animation: none;
+}
+
 
 /* Expandable body — max-height accordion */
 .story-chapter-body {
@@ -1842,7 +1935,7 @@ footer {
             <span class="project-tag">Push Notifications</span>
             <span class="project-tag">Widget</span>
             <span class="project-tag">Dynamic Island</span>
-            <span class="project-tag">14 lines · 270+ stations</span>
+            <span class="project-tag">24 lines · 471 stations</span>
           </div>
           <div class="project-arrow">
             View product
@@ -1908,8 +2001,11 @@ footer {
       <!-- Chapter 01 -->
       <div class="story-chapter reveal rv2" id="chapter-origin">
         <div class="story-chapter-teaser" data-chapter="chapter-origin">
-          <span class="story-chapter-teaser-text">A broken Tube. A brother. A decision.</span>
-          <span class="teaser-toggle">[+]</span>
+          <span class="story-chapter-teaser-inner">
+            <span class="story-chapter-teaser-num">01</span>
+            <span class="story-chapter-teaser-text">A broken Tube. A brother. A decision.<span class="teaser-expand-hint">↓ Read the origin</span></span>
+          </span>
+          <span class="teaser-toggle">+</span>
         </div>
         <div class="story-chapter-body">
           <div class="story-chapter-num">Chapter 01 · The Origin</div>
@@ -1929,15 +2025,18 @@ footer {
       <!-- Chapter 02 -->
       <div class="story-chapter reveal rv3" id="chapter-build">
         <div class="story-chapter-teaser" data-chapter="chapter-build">
-          <span class="story-chapter-teaser-text">AI as co-pilot. Zero prior code. Working app.</span>
-          <span class="teaser-toggle">[+]</span>
+          <span class="story-chapter-teaser-inner">
+            <span class="story-chapter-teaser-num">02</span>
+            <span class="story-chapter-teaser-text">AI as co-pilot. Zero prior code. Working app.<span class="teaser-expand-hint">↓ Read how it was built</span></span>
+          </span>
+          <span class="teaser-toggle">+</span>
         </div>
         <div class="story-chapter-body">
           <div class="story-chapter-num">Chapter 02 · The Build</div>
           <div class="story-chapter-grid">
             <div class="story-chapter-label">AI as co-pilot.<br>Zero prior code.<br>Working app.</div>
             <div class="story-body-text">
-              Built entirely with AI — React Native, the TfL API, Dynamic Island integration across 14 lines and 270+ stations.
+              Built entirely with AI — React Native, the TfL API, Dynamic Island integration across 24 lines and 471 stations.
               <strong>A non-technical founder shipped a working app</strong> because the right tools exist now and the right problem was clear.
               Every interaction was directed, not assembled. Every silence is deliberate.
               The app never asks for your attention — it earns it before you even open it.
@@ -1952,8 +2051,11 @@ footer {
       <!-- Chapter 03 -->
       <div class="story-chapter origin reveal rv4" id="chapter-circle">
         <div class="story-chapter-teaser" data-chapter="chapter-circle">
-          <span class="story-chapter-teaser-text">172 years later. The rails come home.</span>
-          <span class="teaser-toggle">[+]</span>
+          <span class="story-chapter-teaser-inner">
+            <span class="story-chapter-teaser-num">03</span>
+            <span class="story-chapter-teaser-text">172 years later. The rails come home.<span class="teaser-expand-hint">↓ The full circle</span></span>
+          </span>
+          <span class="teaser-toggle">+</span>
         </div>
         <div class="story-chapter-body">
           <div class="story-chapter-num">Chapter 03 · Full Circle</div>
@@ -1975,11 +2077,11 @@ footer {
     <!-- Stats -->
     <div class="story-stats-row reveal">
       <div class="story-stat xray-card">
-        <div class="story-stat-val">14</div>
+        <div class="story-stat-val">24</div>
         <div class="story-stat-label">TfL lines</div>
       </div>
       <div class="story-stat xray-card">
-        <div class="story-stat-val">270+</div>
+        <div class="story-stat-val">471</div>
         <div class="story-stat-label">Stations</div>
       </div>
       <div class="story-stat xray-card">
@@ -2084,7 +2186,7 @@ footer {
           <li><button onclick="document.getElementById('story').scrollIntoView({behavior:'smooth'});" class="footer-link-btn">Story</button></li>
           <li><a href="mailto:hello@ruuuview.com">Email</a></li>
         </ul>
-        <div class="footer-copy">© 2026 Ruuuview · 14 lines · 270+ stations · 0 opens needed</div>
+        <div class="footer-copy">© 2026 Ruuuview · 24 lines · 471 stations · 0 opens needed</div>
       </div>
     </div>
   </div>
@@ -2619,7 +2721,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
 
   // 12-char words
   const words = [
-    ['Y','O','U','R','·','C','O','M','M','U','T','E'],  // YOUR COMMUTE
+    ['M','Y','·','C','O','M','M','U','T','E','·','·'],  // MY COMMUTE
     ['A','S','S','I','S','T','A','N','T','·','·','·'],  // ASSISTANT
     ['A','L','W','A','Y','S','·','O','N','·','·','·'],  // ALWAYS · ON
     ['C','O','M','I','N','G','·','S','O','O','N','·'],  // COMING SOON
@@ -2684,7 +2786,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
   // Rotate status bar messages — with meaningful TfL status context
   const messages = [
     { html: '<strong>iOS Beta Live</strong> · My Commute is watching so you don\'t have to', status: 'blue' },
-    { html: '<strong>14 TfL lines</strong> monitored · 270+ stations · Dynamic Island active', status: 'neutral' },
+    { html: '<strong>24 TfL lines</strong> monitored · 471 stations · Dynamic Island active', status: 'neutral' },
     { html: '<strong>Built solo.</strong> Zero CS degree. Zero prior code. Working app.', status: 'neutral' },
     { html: '<strong>Minor delays</strong> · Circle & District — plan an extra 8 mins', status: 'amber' },
     { html: '<strong>Severe disruption</strong> · Central Line · seek alternative route', status: 'red' },
@@ -2892,18 +2994,23 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
 
 
 /* ============================================================
-   STORY ACCORDION — Fix 3: Mutually exclusive expand/collapse
+   STORY ACCORDION — hover to open (mouseenter/mouseleave + delay)
    ============================================================ */
 (function() {
+  const OPEN_DELAY  = 180;  // ms after hover-in before opening
+  const CLOSE_DELAY = 320;  // ms after hover-out before closing
+
+  const timers = {};
+
   function openChapter(id) {
-    // Close all first
     document.querySelectorAll('.story-chapter').forEach(ch => {
+      if (ch.id === id) return;
       ch.classList.remove('open');
-      const toggle = ch.querySelector('.teaser-toggle');
-      if (toggle) toggle.textContent = '[+]';
+      const t = ch.querySelector('.teaser-toggle');
+      if (t) t.textContent = '+';
     });
-    // Update all nav pills
     document.querySelectorAll('.story-chapter-pill').forEach(p => {
+      if (p.dataset.target === id) return;
       p.classList.remove('active');
       const ind = p.querySelector('.pill-indicator');
       if (ind) ind.textContent = '[+]';
@@ -2911,12 +3018,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
 
     const chapter = document.getElementById(id);
     if (!chapter) return;
-
     chapter.classList.add('open');
-    const toggle = chapter.querySelector('.teaser-toggle');
-    if (toggle) toggle.textContent = '[-]';
 
-    // Sync pill
     const pill = document.querySelector(`.story-chapter-pill[data-target="${id}"]`);
     if (pill) {
       pill.classList.add('active');
@@ -2925,50 +3028,118 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
     }
   }
 
-  // Nav pill clicks
-  document.querySelectorAll('.story-chapter-pill[data-target]').forEach(pill => {
-    pill.addEventListener('click', () => {
-      const targetId = pill.dataset.target;
-      const chapter = document.getElementById(targetId);
-      if (chapter && chapter.classList.contains('open')) {
-        // Toggle off
-        chapter.classList.remove('open');
-        pill.classList.remove('active');
-        const toggle = chapter.querySelector('.teaser-toggle');
-        if (toggle) toggle.textContent = '[+]';
-        const ind = pill.querySelector('.pill-indicator');
-        if (ind) ind.textContent = '[+]';
-      } else {
-        openChapter(targetId);
-        // Smooth scroll into view
-        setTimeout(() => chapter.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-      }
+  function closeChapter(id) {
+    const chapter = document.getElementById(id);
+    if (!chapter) return;
+    chapter.classList.remove('open');
+    const t = chapter.querySelector('.teaser-toggle');
+    if (t) t.textContent = '+';
+    const pill = document.querySelector(`.story-chapter-pill[data-target="${id}"]`);
+    if (pill) {
+      pill.classList.remove('active');
+      const ind = pill.querySelector('.pill-indicator');
+      if (ind) ind.textContent = '[+]';
+    }
+  }
+
+  // Attach hover behaviour to both the teaser row and the pill
+  function attachHover(el, id) {
+    el.addEventListener('mouseenter', () => {
+      clearTimeout(timers[id + '_close']);
+      timers[id + '_open'] = setTimeout(() => openChapter(id), OPEN_DELAY);
     });
+    el.addEventListener('mouseleave', () => {
+      clearTimeout(timers[id + '_open']);
+      timers[id + '_close'] = setTimeout(() => {
+        // Only close if the cursor isn't now over the chapter body
+        const chapter = document.getElementById(id);
+        if (chapter && !chapter.matches(':hover')) closeChapter(id);
+      }, CLOSE_DELAY);
+    });
+  }
+
+  document.querySelectorAll('.story-chapter-teaser').forEach(teaser => {
+    const id = teaser.dataset.chapter;
+    attachHover(teaser, id);
   });
 
-  // Teaser row clicks
-  document.querySelectorAll('.story-chapter-teaser').forEach(teaser => {
-    teaser.addEventListener('click', () => {
-      const id = teaser.dataset.chapter;
-      const chapter = document.getElementById(id);
-      if (chapter && chapter.classList.contains('open')) {
-        chapter.classList.remove('open');
-        const toggle = chapter.querySelector('.teaser-toggle');
-        if (toggle) toggle.textContent = '[+]';
-        const pill = document.querySelector(`.story-chapter-pill[data-target="${id}"]`);
-        if (pill) {
-          pill.classList.remove('active');
-          const ind = pill.querySelector('.pill-indicator');
-          if (ind) ind.textContent = '[+]';
-        }
-      } else {
-        openChapter(id);
-      }
+  document.querySelectorAll('.story-chapter-pill[data-target]').forEach(pill => {
+    attachHover(pill, pill.dataset.target);
+  });
+
+  // Keep chapter open while hovering the body itself
+  document.querySelectorAll('.story-chapter').forEach(chapter => {
+    const id = chapter.id;
+    chapter.addEventListener('mouseenter', () => clearTimeout(timers[id + '_close']));
+    chapter.addEventListener('mouseleave', () => {
+      clearTimeout(timers[id + '_open']);
+      timers[id + '_close'] = setTimeout(() => closeChapter(id), CLOSE_DELAY);
     });
   });
 })();
 
 
+
+
+/* ============================================================
+   SYNTH CLICK — Web Audio API, global interaction sound
+   ============================================================ */
+(function() {
+  let ctx = null;
+
+  function ensureCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  function playClick(e) {
+    // Skip if the event originates from a purely decorative element
+    const el = e.target;
+    const tag = el.tagName;
+    if (['HTML','BODY','SECTION','MAIN','HEADER','FOOTER','HR'].includes(tag)) return;
+
+    const ac = ensureCtx();
+    const now = ac.currentTime;
+
+    // Transient body — short sine burst
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain);
+    gain.connect(ac.destination);
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(820, now);
+    osc.frequency.exponentialRampToValueAtTime(320, now + 0.045);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.14, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+
+    // Subtle high-freq click transient
+    const noise = ac.createOscillator();
+    const noiseGain = ac.createGain();
+    noise.connect(noiseGain);
+    noiseGain.connect(ac.destination);
+
+    noise.type = 'square';
+    noise.frequency.setValueAtTime(3800, now);
+    noiseGain.gain.setValueAtTime(0.04, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+
+    osc.start(now);
+    osc.stop(now + 0.06);
+    noise.start(now);
+    noise.stop(now + 0.02);
+  }
+
+  // Attach to document — captures bubbled events from all interactive elements
+  document.addEventListener('click',      playClick, { passive: true });
+  document.addEventListener('mousedown',  playClick, { passive: true });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') playClick(e);
+  }, { passive: true });
+})();
 
 
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
